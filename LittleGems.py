@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 import calendar 
+from datetime import date, timedelta, datetime
 
 # Load the file with the new name
 fname = "Waffles.csv"
@@ -70,6 +71,19 @@ X_scaled = scaler.fit_transform(features)
 # -----------
 
 # K-Means clustering 
+def generate_taco_tuesday(start_date, end_date):
+    start_date = datetime.fromisoformat(start_date).date()
+    end_date = datetime.fromisoformat(end_date).date()
+    tues = (1 - start_date.weekday()) % 7
+    first_tuesday = start_date + timedelta(days=tues)
+
+    custom = {}
+    d = first_tuesday
+    while d <= end_date:
+        custom[d.isoformat()] = "Taco Tuesday"
+        d += timedelta(days=7)
+    return custom
+
 kmeans = KMeans(n_clusters=5, random_state=42)
 
 df.loc[features.index, 'TrafficGroup'] = kmeans.fit_predict(X_scaled)
@@ -118,37 +132,135 @@ color_map = {
 }
 df['Color'] = df['TrafficGroupSimplified'].map(color_map)
 
-years = df[date_col].dt.year.unique()
+df['weekday'] = df[date_col].dt.weekday
+df['week_of_month'] = df[date_col].apply(lambda d: (d.day - 1) // 7 + 1)
+df['month'] = df[date_col].dt.month
+df['year'] = df[date_col].dt.year
 
+# -----------------------------
+# CUSTOM LABELS FROM 2024 DATA
+# (You can edit these for 2024)
+# -----------------------------
+df['Label'] = ""  # default blank
+
+start = "2025-10-01"
+end = "2026-12-31"
+# Example events in 2024 (modify these!)
+custom_labels = {
+    "2025-12-24": "Christmas Eve",
+    "2025-12-25": "Christmas",
+    "2025-11-27": "Thanksgiving",
+    "2026-11-26": "Thanksgiving"
+}
+custom_labels.update(generate_taco_tuesday(start, end))
+# for k,v in custom_labels.items():
+#     df.loc[df[date_col] == k, "Label"] = v
+
+# -----------------------------
+# BUILD FUTURE DATE RANGE
+# Oct 2025 → Dec 2026
+# -----------------------------
+
+future_dates = pd.date_range(start, end, freq='D')
+future = pd.DataFrame({'Date': future_dates})
+
+future['weekday'] = future['Date'].dt.weekday
+future['week_of_month'] = future['Date'].apply(lambda d: (d.day - 1) // 7 + 1)
+future['month'] = future['Date'].dt.month
+future['year'] = future['Date'].dt.year
+
+# -----------------------------
+# PROJECTION:
+# Match (month, weekday, week_of_month) with 2024 data
+# -----------------------------
+template = (
+    df.sort_values(date_col)      # ensures consistent overwrite order
+      .drop_duplicates(
+          subset=['month', 'weekday', 'week_of_month'],
+          keep='last'
+      )
+      .copy()
+)
+
+projection = future.merge(
+    template[['month', 'weekday', 'week_of_month', 'TrafficGroupSimplified', 'Color', 'Label']],
+    on=['month', 'weekday', 'week_of_month'],
+    how='left'
+)
+projection['TextColor'] = None # default text color
+
+for k, v in custom_labels.items():
+    d = pd.to_datetime(k)
+    projection.loc[projection['Date'] == d, "Label"] = v
+
+    # if v == "Taco Tuesday":
+    #     projection.loc[projection['Date'] == d, "Color"] = "#FFEAC4"
+
+# -----------------------------
+# HTML CALENDAR GENERATION
+# -----------------------------
 html_full = ""
 
-for year in sorted(years):
-    months = df[df[date_col].dt.year == year][date_col].dt.month.unique()
-    for month in sorted(months):
-        cal = calendar.Calendar()
-        html = '<table border="1" style="border-collapse: collapse; text-align:center; margin-bottom:20px;">'
-        html += f'<tr><th colspan="7">{calendar.month_name[month]} {year}</th></tr>'
-        html += '<tr>' + ''.join(f'<th>{day}</th>' for day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']) + '</tr>'
+# Calendar range:
+start_year, start_month = 2025, 10   # October 2025
+end_year, end_month = 2026, 12       # December 2026
 
-        for week in cal.monthdatescalendar(year, month): # I mean this is just a loop over the calendar year 
-            html += '<tr>'
+for year in range(start_year, end_year + 1):
+
+    if year == start_year:
+        months = range(start_month, 13)
+    elif year == end_year:
+        months = range(1, end_month + 1)
+    else:
+        months = range(1, 13)
+
+    for month in months:
+        cal = calendar.Calendar()
+
+        html = '''
+        <table border="1" style="border-collapse: collapse; text-align:center;
+                                margin-bottom:20px; width: 100%; font-family: Arial;">
+        '''
+        html += f'<tr><th colspan="7" style="padding:10px; font-size:20px;">{calendar.month_name[month]} {year}</th></tr>'
+        html += '<tr>' + ''.join(
+            f'<th style="padding:5px;">{d}</th>' 
+            for d in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+        ) + '</tr>'
+
+        # generate weeks
+        for week in cal.monthdatescalendar(year, month):
+            html += "<tr>"
+
             for day in week:
                 if day.month == month:
-                    # get color for this date
-                    row = df[df[date_col].dt.date == day]
-                    if not row.empty:
-                        color = row['Color'].values[0]
-                    else:
-                        color = 'white'  # empty day
-                    html += f'<td style="background-color:{color}; width:40px; height:40px;">{day.day}</td>'
-                else:
-                    html += '<td></td>'  
-            html += '</tr>'
-        html += '</table>'
 
+                    # look up projected data
+                    row = projection[projection['Date'] == pd.to_datetime(day)]
+
+                    if not row.empty:
+                        color = row['Color'].values[0] if pd.notna(row['Color'].values[0]) else 'white'
+                        label = row['Label'].values[0] if pd.notna(row['Label'].values[0]) else ""
+                    else:
+                        color = 'white'
+                        label = ""
+
+                    html += f'''
+                    <td style="background-color:{color}; width:130px; height:90px; vertical-align:top;">
+                        <div style="font-weight:bold; font-size:16px; margin-top:5px;">{day.day}</div>
+                        <div style="font-size:12px; margin-top:5px;">{label}</div>
+                    </td>
+                    '''
+                else:
+                    html += "<td></td>"
+
+            html += "</tr>"
+
+        html += "</table>"
         html_full += html
 
-with open('traffic_calendar.html', 'w') as f:
+
+with open("traffic_calendar_projection.html", "w") as f:
     f.write(html_full)
 
-print("HTML calendar created: traffic_calendar.html")
+print("Projection calendar created: traffic_calendar_projection.html")
+
