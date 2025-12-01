@@ -133,44 +133,44 @@ df['Label'] = ""  # default blank
 
 start = "2025-10-01"
 end = "2026-12-31"
-# Example events in 2024 (modify these!)
+# Example events in 2025-2026 (modify these!). Please REMEMBER TO ADD A COMMA AFTER EACH ONE
 custom_labels = {
-    "2025-10-17": "Cal VS UNC Football"
-    "2025-10-31": "Halloween"
-    "2025-11-26": "No Instruction"
-    "2025-11-27": "Thanksgiving"
-    "2026-11-29": "Cal VS SMU Football"
-    "2025-12-8": "RRR Week Begins"
-    "2025-12-15": "Final Examination"
-    "2025-12-20": "Winter Break Begins"
+    "2025-10-17": "Cal VS UNC Football",
+    "2025-10-31": "Halloween",
+    "2025-11-26": "No Instruction",
+    "2025-11-27": "Thanksgiving",
+    "2026-11-29": "Cal VS SMU Football",
+    "2025-12-8": "RRR Week Begins",
+    "2025-12-15": "Final Examination",
+    "2025-12-20": "Winter Break Begins",
     "2025-12-24": "Christmas Eve",
     "2025-12-25": "Christmas",
-    "2026-1-20": "Class Resumes"
-    "2026-2-16": "MLK Day"
-    "2026-3-17": "St. Patrick's Day"
-    "2026-3-21": "Spring Break"
-    "2026-3-30": "Class Resumes"
-    "2026-4-20": "420"
-    "2026-5-4": "RRR Week Begins"
-    "2026-5-11": "Final Examination"
-    "2026-5-16": "Commencement"
-    "2026-5-17": "Summer Break Begins"
-    "2026-5-26": "Summer Session A Begins"
-    "2026-6-8": "Summer Session B Begins"
-    "2026-8-15": "Move In"
-    "2026-8-26": "Class Resumes"
-    "2026-9-5": "Cal VS UCLA Football"
-    "2026-9-19": "Cal VS Wagner Football"
-    "2026-10-31": "Halloween"
-    "2026-11-21": "Cal VS Stanford Football (Big Game)"
-    "2026-11-26": "Thanksgiving"
-    "2026-12-7": "RRR Week Begins"
-    "2026-12-14": "Final Examination"
-    "2026-12-19": "Winter Break Begins"
+    "2026-1-20": "Class Resumes",
+    "2026-2-16": "MLK Day",
+    "2026-3-17": "St. Patrick's Day",
+    "2026-3-21": "Spring Break",
+    "2026-3-30": "Class Resumes",
+    "2026-4-20": "420",
+    "2026-5-4": "RRR Week Begins",
+    "2026-5-11": "Final Examination",
+    "2026-5-16": "Commencement",
+    "2026-5-17": "Summer Break Begins",
+    "2026-5-26": "Summer Session A Begins",
+    "2026-6-8": "Summer Session B Begins",
+    "2026-8-15": "Move In",
+    "2026-8-26": "Class Resumes",
+    "2026-9-5": "Cal VS UCLA Football",
+    "2026-9-19": "Cal VS Wagner Football",
+    "2026-10-31": "Halloween",
+    "2026-11-21": "Cal VS Stanford Football (Big Game)",
+    "2026-11-26": "Thanksgiving",
+    "2026-12-7": "RRR Week Begins",
+    "2026-12-14": "Final Examination",
+    "2026-12-19": "Winter Break Begins",
     "2026-12-24": "Christmas Eve",
     "2026-12-25": "Christmas",
 }
-custom_labels.update(generate_taco_tuesday(start, end))
+# custom_labels.update(generate_taco_tuesday(start, end))
 # for k,v in custom_labels.items():
 #     df.loc[df[date_col] == k, "Label"] = v
 
