@@ -139,7 +139,7 @@ custom_labels = {
     "2025-10-31": "Halloween",
     "2025-11-26": "No Instruction",
     "2025-11-27": "Thanksgiving",
-    "2026-11-29": "Cal VS SMU Football",
+    "2025-11-29": "Cal VS SMU Football",
     "2025-12-8": "RRR Week Begins",
     "2025-12-15": "Final Examination",
     "2025-12-20": "Winter Break Begins",
