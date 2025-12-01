@@ -81,10 +81,10 @@ df.loc[features.index, 'TrafficGroup'] = kmeans.fit_predict(X_scaled)
 
 df['TrafficGroupSimplified'] = df['TrafficGroup'].replace({
     0: 'Very_High', # combined groups 0 and 4 because their average sales were similar enough
-    4: 'High',
+    4: 'Average',
     2: 'Higher',
     1: 'Low',
-    3: 'Average' # look at printout for mean sale count to see why I clustered like this.
+    3: 'Lower' # look at printout for mean sale count to see why I clustered like this.
 })
 
 # Plot grouped net sales
@@ -213,6 +213,19 @@ for k, v in custom_labels.items():
 
     # if v == "Taco Tuesday":
     #     projection.loc[projection['Date'] == d, "Color"] = "#FFEAC4"
+# ----- MANUAL COLOR OVERRIDES -----
+
+force_colors = {
+    "2026-08-26": "#B6A2D8",  # purple
+    "2025-10-31": "#E8A1A5",  # red
+    "2025-11-29": "#E8A1A5",  # red
+    "2026-08-15": "#E8A1A5",  # red
+    "2026-10-30": "#E8A1A5",  # red
+    "2026-10-31": "#E8A1A5",  # red
+}
+
+for dt, color in force_colors.items():
+    projection.loc[projection['Date'] == pd.to_datetime(dt), "Color"] = color
 
 # -----------------------------
 # HTML CALENDAR GENERATION
