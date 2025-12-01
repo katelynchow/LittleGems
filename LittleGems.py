@@ -116,7 +116,7 @@ color_map = {
     'High': '#E8A1A5', #red
     'Average': '#D7E9CB', # light green
     'Lower': '#9DBCF2', # light blue 
-    'Low': '#C7DAF5' #ice blue
+    'Low': '#C7DAF5', #ice blue
 }
 df['Color'] = df['TrafficGroupSimplified'].map(color_map)
 
